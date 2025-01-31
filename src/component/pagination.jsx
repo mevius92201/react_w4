@@ -3,4 +3,3 @@ function Cal (){
     const totalData = 0
 }
 
-export default App

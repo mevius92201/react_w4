@@ -18,7 +18,7 @@ const defaultModal = {
   description: "",
   content: "",
   is_enabled: false,
-  imagesUrl: [""]
+  imagesUrl: []
 }
 function App() {
   const [formData, setFormData] = useState({
@@ -34,7 +34,7 @@ function App() {
   const deleteModalRef = useRef(null);
   const myDeleteModalRef = useRef(null);
   const [inputImageValue, setInputImageValue] = useState("");
-  const [currentPage, setCurrentPage] = useState(1)
+ //const [currentPage, setCurrentPage] = useState(1)
   const [pagination, setPagination] = useState({
     total_pages: 1,
     current_page: 1,
@@ -83,9 +83,9 @@ function App() {
       alert("登入失敗: " + error.response.data.message);
     }
   };
-  const getProducts = async () => {
+  const getProducts = async (page=1) => {
     try {
-      const res = await axios.get(`${API_BASE}/api/${API_PATH}/admin/products`);
+      const res = await axios.get(`${API_BASE}/api/${API_PATH}/admin/products?page=${page}`);
       setProducts(res.data.products);
       setPagination(res.data.pagination)
     } catch (error) {
@@ -95,25 +95,25 @@ function App() {
 
 const handlePageChange = (newPage) => {
   if (newPage >= 1 && newPage <= pagination.total_pages){
-    setCurrentPage(newPage)
+    getProducts(newPage)
 }
 }
 
- const getPaginationProducts = () => {
-    const perPage = 10
-    //const pageTotal = Math.ceil(productNum/perPage)  
-    //const currentPage = page > pageTotal ? pageTotal : page
-    const minData = (currentPage * perPage) - perPage + 1
-    const maxData = (currentPage * perPage) 
-    return products.slice(minData, maxData)
-  }
+//  const getPaginationProducts = () => {
+//     const perPage = 10
+//     //const pageTotal = Math.ceil(productNum/perPage)  
+//     //const currentPage = page > pageTotal ? pageTotal : page
+//     const minData = (currentPage * perPage) - perPage + 1
+//     const maxData = (currentPage * perPage) 
+//     return products.slice(minData, maxData)
+//   }
 
     const renderPaginationButtons = () => {
       const totalPages = pagination.total_pages;
       let pages = [];
       for (let i = 1; i <= totalPages; i++) {
         pages.push(
-          <li className={`page-item ${i === currentPage ? 'active' : ''}`} key={i}>
+          <li className={`page-item ${i === pagination.current_page ? 'active' : ''}`} key={i}>
             <button
               className="page-link"
               onClick={() => handlePageChange(i)}
@@ -287,7 +287,7 @@ const submitProduct = async () =>{
                 </tr>
               </thead>
               <tbody>
-                {getPaginationProducts().map((item) => (
+                {products.map((item) => (
                   <tr key={item.id}>
                     <td>{item.category}</td>
                     <td>{item.title}</td>
@@ -328,25 +328,27 @@ const submitProduct = async () =>{
           <div className="d-flex justify-content-center">
             <nav>
             <ul className="pagination">
+            {pagination.has_pre && (
             <li className={`page-item ${pagination.has_pre ? "" : "disabled"}`}>
             <button
               className="page-link"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={!pagination.has_pre}
+              onClick={() => handlePageChange(pagination.current_page - 1)}
             >
             上一頁
             </button>
             </li>
+            )}
             {renderPaginationButtons()}
+            {pagination.has_next && (
             <li className={`page-item ${pagination.has_next ? "" : "disabled"}`}>
             <button
               className="page-link"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={!pagination.has_next}
+              onClick={() => handlePageChange(pagination.current_page + 1)}
             >
             下一頁
             </button>
             </li>
+            )}
             </ul>
             </nav>
           </div>
