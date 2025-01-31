@@ -25,8 +25,23 @@ function App() {
     username: "",
     password: ""
   });
-  const [isAuth, setisAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
   const [products, setProducts] = useState([]);
+  const modalRef = useRef(null);
+  const myModalRef = useRef(null);
+  const [modalState, setModalState] = useState(null);
+  const [productModal, setProductModal] = useState(defaultModal);
+  const deleteModalRef = useRef(null);
+  const myDeleteModalRef = useRef(null);
+  const [inputImageValue, setInputImageValue] = useState("");
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pagination, setPagination] = useState({
+    total_pages: 1,
+    current_page: 1,
+    has_pre: false,
+    has_next: false,
+  });
+
 
   useEffect(() => {
     const token = document.cookie.replace(
@@ -40,7 +55,7 @@ function App() {
   const checkAdmin = async () => {
     try {
       await axios.post(`${API_BASE}/api/user/check`);
-      setisAuth(true);
+      setIsAuth(true);
       getProducts();
     } catch (err) {
       console.log(err.response.data.message);
@@ -62,7 +77,7 @@ function App() {
       const { token, expired } = response.data;
       document.cookie = `access_token=${token};expires=${new Date(expired)};`;
       axios.defaults.headers.common.Authorization = token;
-      setisAuth(true);
+      setIsAuth(true);
       getProducts();
     } catch (error) {
       alert("登入失敗: " + error.response.data.message);
@@ -72,18 +87,46 @@ function App() {
     try {
       const res = await axios.get(`${API_BASE}/api/${API_PATH}/admin/products`);
       setProducts(res.data.products);
+      setPagination(res.data.pagination)
     } catch (error) {
       console.log(error.response.message);
     }
   };
 
-  const modalRef = useRef(null);
-  const myModalRef = useRef(null);
-  const [modalState, setModalState] = useState(null);
-  const [productModal, setProductModal] = useState(defaultModal);
-  const deleteModalRef = useRef(null);
-  const myDeleteModalRef = useRef(null);
-  const [inputImageValue, setInputImageValue] = useState("");
+const handlePageChange = (newPage) => {
+  if (newPage >= 1 && newPage <= pagination.total_pages){
+    setCurrentPage(newPage)
+}
+}
+
+ const getPaginationProducts = () => {
+    const perPage = 10
+    //const pageTotal = Math.ceil(productNum/perPage)  
+    //const currentPage = page > pageTotal ? pageTotal : page
+    const minData = (currentPage * perPage) - perPage + 1
+    const maxData = (currentPage * perPage) 
+    return products.slice(minData, maxData)
+  }
+
+    const renderPaginationButtons = () => {
+      const totalPages = pagination.total_pages;
+      let pages = [];
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(
+          <li className={`page-item ${i === currentPage ? 'active' : ''}`} key={i}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(i)}
+            >
+              {i}
+            </button>
+          </li>
+        );
+      }
+      return pages;
+    };
+  
+
 
   useEffect(() => {
     if (modalRef.current !== null && myModalRef.current === null) {
@@ -227,7 +270,9 @@ const submitProduct = async () =>{
             <div className="text-end mt-4">
               <button className="btn btn-primary" 
               onClick={() => 
-                {hasModalShow('add')}
+                {hasModalShow('add');
+                setProductModal(defaultModal);
+                }
                 }>建立新的產品</button>
             </div>
             <table className="table mt-4">
@@ -242,7 +287,7 @@ const submitProduct = async () =>{
                 </tr>
               </thead>
               <tbody>
-                {products.map((item) => (
+                {getPaginationProducts().map((item) => (
                   <tr key={item.id}>
                     <td>{item.category}</td>
                     <td>{item.title}</td>
@@ -260,7 +305,7 @@ const submitProduct = async () =>{
                         <button
                           type="button"
                           className="btn btn-outline-primary btn-sm"
-                          onClick={() =>{hasModalShow(`edit`, item)}}
+                          onClick={() =>{hasModalShow(`edit`, item);}}
                           
                         >
                           編輯
@@ -279,6 +324,33 @@ const submitProduct = async () =>{
               </tbody>
             </table>
           </div>
+          {pagination.total_pages > 1 && (
+          <div className="d-flex justify-content-center">
+            <nav>
+            <ul className="pagination">
+            <li className={`page-item ${pagination.has_pre ? "" : "disabled"}`}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={!pagination.has_pre}
+            >
+            上一頁
+            </button>
+            </li>
+            {renderPaginationButtons()}
+            <li className={`page-item ${pagination.has_next ? "" : "disabled"}`}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!pagination.has_next}
+            >
+            下一頁
+            </button>
+            </li>
+            </ul>
+            </nav>
+          </div>
+          )}
         </div>
       ) : (
         <div className="container login">
@@ -549,4 +621,4 @@ const submitProduct = async () =>{
   );
 }
 
-export default App
+export default App;
