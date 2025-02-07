@@ -33,7 +33,12 @@ function App() {
   const [productModal, setProductModal] = useState(defaultModal);
   const deleteModalRef = useRef(null);
   const myDeleteModalRef = useRef(null);
-  const [inputImageValue, setInputImageValue] = useState("");
+  const [inputImageValue, setInputImageValue] = useState({
+    imageUrl: "",
+    images: []
+  })
+  //const [inputImageValue, setInputImageValue] = useState("");
+  //const [inputImagesValue, setInputImagesValue] = useState("");
  //const [currentPage, setCurrentPage] = useState(1)
   const [pagination, setPagination] = useState({
     total_pages: 1,
@@ -183,21 +188,32 @@ const hasDeleteModalShow = (item) =>{
       console.log('deleteModalRef.current is null')
     }
   }
+  
   const handleImageChange = (e) => {
-    const {value} = e.target
-    setInputImageValue(value)
+    const {value, id} = e.target
+    setInputImageValue((pre) =>({
+      ...pre,
+      [id]: value
+    }))
+    console.log(inputImageValue)
   }
 
-  const addImage = () => {
+  const addImages = () => {
     const newImagesUrl = [...productModal.imagesUrl, inputImageValue]
     setProductModal({
       ...productModal,
       imagesUrl: newImagesUrl
     })
-    setInputImageValue("")
+    setInputImageValue({imagesUrl: ""})
   }
-
-  const deleteImage = () => {
+  const addImage = () => {
+    setProductModal({
+      ...productModal,
+      imageUrl: inputImageValue.imageUrl
+    })
+    setInputImageValue({imageUrl: ""})
+  }
+  const deleteImages = () => {
     const newImagesUrl = [...productModal.imagesUrl]
     newImagesUrl.pop()
     setProductModal({
@@ -205,6 +221,27 @@ const hasDeleteModalShow = (item) =>{
       imagesUrl: newImagesUrl
     })
   }
+  const deleteImage = () => {
+    setProductModal({
+      ...productModal,
+      imageUrl: ""
+    })
+  }
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0]
+    const formData = new FormData()
+    formData.append('file-to-upload', file)
+      try{
+        const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData) 
+        setProductModal({
+         ...productModal,
+          imageUrl: res.data.imageUrl
+        })
+      }catch(err){
+        console.log("upload failed")
+      }
+    }
+  
   
   const setModalContent = (e) => {
     const {value, name, checked, type} = e.target
@@ -422,37 +459,88 @@ const submitProduct = async () =>{
             <div className="modal-body">
               <div className="row">
                 <div className="col-sm-4">
+              
+                
                   <div className="mb-2">
-                    <div className="mb-3">
+                  <div className="mb-3">
                       <label htmlFor="imageUrl" className="form-label">
-                        輸入圖片網址
+                        主圖
                       </label>
                       <input
-                      value={inputImageValue}
+                      value={inputImageValue.imageUrl}
                       onChange={handleImageChange}
-                      name="imageUrl"
+                      id="imageUrl"
                         type="text"
                         className="form-control"
                         placeholder="請輸入圖片連結"
+                        {...(productModal.imageUrl ? {disabled: true} : {})}
+                        required
+                        
                       />
                     </div>
-                    {productModal.imagesUrl.map((url,index) => (
-                      <img key={index} 
-                      className="img-fluid" 
-                      src={url} 
-                      alt={productModal.title} />))}
-                  </div>
-                  <div>
-                    {productModal.imagesUrl.length < 5 && (<button 
+                    <div className="mb-1">
+                  <label htmlFor="fileInput" className="form-label"> </label>
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    className="form-control"
+                    id="fileInput"
+                    onChange={handleFileChange}
+                    //value={productModal.imageUrl}
+                  />
+                    </div>
+                     {productModal.imageUrl? <img
+                        className="img-fluid"
+                        src={productModal.imageUrl}
+                        alt={productModal.title}
+                      /> : null}
+                      
+                    <div>
+                    {inputImageValue.imageUrl && (<button 
                     className="btn btn-outline-primary btn-sm d-block w-100"
                     onClick={addImage}>
                       新增圖片
                     </button>)}
                   </div>
                   <div>
-                    {productModal.imagesUrl && productModal.imagesUrl.length >1 && (<button
+                    {productModal.imageUrl && (<button
                     className="btn btn-outline-danger btn-sm d-block w-100"
                     onClick={deleteImage}>
+                      刪除圖片
+                    </button>)}
+                  </div>
+                    <div className="mb-3">
+                      <label htmlFor="imagesUrl" className="form-label">
+                        附圖
+                      </label>
+                      <input
+                      value={inputImageValue.imagesUrl}
+                      onChange={handleImageChange}
+                      id="imagesUrl"
+                        type="text"
+                        className="form-control"
+                        placeholder="請輸入圖片連結"
+                      />
+                    </div>
+                    <div className="mb-2">
+                    {productModal.imagesUrl.map((url,index) => (
+                      <img key={index} 
+                      className="img-fluid" 
+                      src={url} 
+                      alt={productModal.title} />))}
+                      </div>
+                  </div>
+                  <div>
+                    {productModal.imagesUrl.length < 5 && inputImageValue.imagesUrl && (<button 
+                    className="btn btn-outline-primary btn-sm d-block w-100"
+                    onClick={addImages}>
+                      新增圖片
+                    </button>)}
+                  </div>
+                  <div>
+                    {productModal.imagesUrl && productModal.imagesUrl.length >=1 && (<button
+                    className="btn btn-outline-danger btn-sm d-block w-100"
+                    onClick={deleteImages}>
                       刪除圖片
                     </button>)}
                   </div>
