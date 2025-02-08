@@ -1,4 +1,3 @@
-
 function Pagination ({getProducts, pagination}) {
 
     const handlePageChange = (newPage) => {
@@ -23,6 +22,15 @@ function Pagination ({getProducts, pagination}) {
         }
         return pages;
     };
+
+    //  const getPaginationProducts = () => {
+    //     const perPage = 10
+    //     //const pageTotal = Math.ceil(productNum/perPage)  
+    //     //const currentPage = page > pageTotal ? pageTotal : page
+    //     const minData = (currentPage * perPage) - perPage + 1
+    //     const maxData = (currentPage * perPage) 
+    //     return products.slice(minData, maxData)
+    //   }
 
     
     if (pagination.total_pages > 1) {
