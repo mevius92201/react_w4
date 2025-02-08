@@ -1,5 +1,4 @@
 import axios from "axios";
-
 import { useState } from 'react';
 
 const API_BASE = "https://ec-course-api.hexschool.io/v2";
