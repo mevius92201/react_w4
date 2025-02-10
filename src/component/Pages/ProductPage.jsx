@@ -1,8 +1,15 @@
-
-import { useState} from 'react';
 import Pagination from '../Pagination';
-
-function ProductPage({myModalRef, myDeleteModalRef, setIsProductModalOpen, setIsDeleteModalOpen, getProducts, pagination, setModalState, setProductModal, defaultModal, products}){
+function ProductPage({
+    myModalRef,
+    myDeleteModalRef,
+    setIsProductModalOpen,
+    setIsDeleteModalOpen,
+    getProducts,
+    pagination,
+    setModalState,
+    setProductModal,
+    defaultModal,
+    products}){
     
     const hasModalShow = (state, item) =>{
       setProductModal(state);
@@ -73,8 +80,7 @@ function ProductPage({myModalRef, myDeleteModalRef, setIsProductModalOpen, setIs
                         <button
                             type="button"
                             className="btn btn-outline-primary btn-sm"
-                            onClick={() =>{hasModalShow(`edit`, item);}}
-                            
+                            onClick={() =>{hasModalShow(`edit`, item);}}     
                         >
                             編輯
                         </button>

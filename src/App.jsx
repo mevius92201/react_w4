@@ -1,20 +1,16 @@
 import axios from "axios";
 import './assets/all.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Modal } from 'bootstrap';
 import { useState, useEffect, useRef } from 'react';
 import LoginPage from './component/Pages/LoginPage';
-import Pagination from './component/Pagination';
 import ProductModal from './component/ProductModal';
 import DeleteModal from "./component/DeleteModal";
 import ProductPage from "./component/Pages/ProductPage";
-
 const API_BASE = "https://ec-course-api.hexschool.io/v2";
 const API_PATH = "mevius"; 
 
 
 function App() {
-
   const [isAuth, setIsAuth] = useState(false);
   const myModalRef = useRef(null);
   const myDeleteModalRef = useRef(null);
@@ -35,7 +31,7 @@ function App() {
     is_enabled: false,
     imagesUrl: []
 }
-const [productModal, setProductModal] = useState(defaultModal);
+  const [productModal, setProductModal] = useState(defaultModal);
   //const [inputImageValue, setInputImageValue] = useState("");
   //const [inputImagesValue, setInputImagesValue] = useState("");
  //const [currentPage, setCurrentPage] = useState(1)
@@ -82,8 +78,6 @@ const [productModal, setProductModal] = useState(defaultModal);
   //     console.log('modalRef.current is null')
   //   }
   // }
-  
-
   return (
     <>
       {isAuth ? (
