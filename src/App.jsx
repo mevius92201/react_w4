@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import LoginPage from './component/Pages/LoginPage';
 import Pagination from './component/Pagination';
 import ProductModal from './component/ProductModal';
+import DeleteModal from "./component/DeleteModal";
 
 const API_BASE = "https://ec-course-api.hexschool.io/v2";
 const API_PATH = "mevius"; 
@@ -30,8 +31,8 @@ function App() {
   const myModalRef = useRef(null);
   const [modalState, setModalState] = useState(null);
   const [productModal, setProductModal] = useState(defaultModal);
-  const deleteModalRef = useRef(null);
   const myDeleteModalRef = useRef(null);
+ 
  
   //const [inputImageValue, setInputImageValue] = useState("");
   //const [inputImagesValue, setInputImagesValue] = useState("");
@@ -79,48 +80,33 @@ function App() {
   //     console.log('modalRef.current is null')
   //   }
   // }
-  useEffect (()=>{
-    if (deleteModalRef.current !== null && myDeleteModalRef.current === null){
-      myDeleteModalRef.current = new Modal(deleteModalRef.current, {
-        keyboard: false,
-        backdrop: "static"
-      });
-    }
-  },[])
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
 
   const hasDeleteModalShow = (item) =>{
-    setProductModal(item);
+    setProductModal({
+      ...item,
+      imagesUrl: [],
+    });
     if (myDeleteModalRef.current !== null){
-      myDeleteModalRef.current.show();
+      //myDeleteModalRef.current.show();
+      setIsDeleteModalOpen(true);
     } else {
       console.log('modalRef.current is null')
     }
   }
-  const hasDeleteModalHide = () =>{
-    if (myDeleteModalRef.current !== null){
-      myDeleteModalRef.current.hide();
-    } else {
-      console.log('deleteModalRef.current is null')
-    }
-  }
-  const deleteProduct = async () => {
-    try{
-      await axios.delete(`${API_BASE}/api/${API_PATH}/admin/product/${productModal.id}`);
-      getProducts();
-      hasDeleteModalHide()
-    } catch (error) {
-      console.log("delete failed");
-    }
-  };  
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
   const hasModalShow = (state, item) =>{
     setProductModal(state);
     if (state === 'add'){
       setProductModal(
         {...defaultModal})
+        setModalState('add')
     } else {
       setProductModal(item)
+      setModalState('edit')
     }
     if (myModalRef.current !== null){
       setIsProductModalOpen(true);
@@ -128,10 +114,6 @@ function App() {
       console.log('modalRef.current is null')
     }
 }
-
-
-
-
 
   return (
     <>
@@ -199,32 +181,20 @@ function App() {
         </div>
       ) : <LoginPage getProducts={getProducts} setIsAuth={setIsAuth}/> }
       <ProductModal 
-      modalState={modalState} 
+      modalState={modalState}
       productModal={productModal} 
       getProducts={getProducts} 
       isOpen={isProductModalOpen} 
       setIsOpen={setIsProductModalOpen}
-      myModalRef={myModalRef} />
-      <div className="modal fade" id="deleteModal" ref={deleteModalRef} tabIndex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title" id="deleteModalLabel">Notice</h5>
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
-            onClick={hasDeleteModalHide}></button>
-          </div>
-          <div className="modal-body">
-            Are you sure you want to delete {productModal.title}?
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal"
-            onClick={hasDeleteModalHide}>Cancel</button>
-            <button type="button" className="btn btn-primary"
-            onClick={deleteProduct}>Confirm</button>
-          </div>
-        </div>
-      </div>
-    </div>
+      myModalRef={myModalRef} 
+      />
+      <DeleteModal 
+      productModal={productModal} 
+      getProducts={getProducts}
+      myDeleteModalRef={myDeleteModalRef}
+      isOpen={isDeleteModalOpen} 
+      setIsOpen={setIsDeleteModalOpen}
+      />
     </>
   );
 }

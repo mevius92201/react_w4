@@ -1,11 +1,12 @@
 import axios from "axios";
 import { Modal } from 'bootstrap';
 import { useState, useEffect, useRef } from "react";
-
-function ProductModal ({modalState, productModal, getProducts, isOpen, setIsOpen, myModalRef}) {
+const API_BASE = "https://ec-course-api.hexschool.io/v2";
+const API_PATH = "mevius"; 
+function ProductModal ({ modalState, productModal, getProducts, isOpen, setIsOpen, myModalRef}) {
     const [modalData, setModalData] = useState(productModal)
     const modalRef = useRef(null);
-
+    
     useEffect(() => {
         setModalData({
             ...productModal
@@ -31,7 +32,6 @@ useEffect(() => {
     if(isOpen){
         myModalRef.current.show()
     } 
- 
 },[isOpen])
 
     const hasModalHide = () =>{
@@ -49,10 +49,10 @@ useEffect(() => {
           ...pre,
           [id]: value
         }))
-        console.log(inputImageValue)
+        //console.log(inputImageValue)
     }
     const addImages = () => {
-    const newImagesUrl = [...modalData.imagesUrl, inputImageValue]
+    const newImagesUrl = [...modalData.imagesUrl, inputImageValue.images]
     setModalData({
         ...modalData,
         imagesUrl: newImagesUrl
@@ -137,9 +137,11 @@ useEffect(() => {
     const submitProduct = async () =>{
     const updateModal = modalState === 'add' ? addProduct : editProduct;
     try{
+        //console.log(modalState)
         await updateModal();
         getProducts();
         hasModalHide()
+        setModalData(productModal)
         } catch(error){
         console.log("submit failed")
     }
@@ -231,7 +233,7 @@ useEffect(() => {
                     />
                 </div>
                 <div className="mb-2">
-                    {modalData.imagesUrl.map((url,index) => (
+                    {modalData.imagesUrl?.map((url,index) => (
                     <img key={index} 
                     className="img-fluid" 
                     src={url} 
@@ -239,14 +241,14 @@ useEffect(() => {
                 </div>
               </div>
               <div>
-                {modalData.imagesUrl.length < 5 && inputImageValue.imagesUrl && (<button 
+                {modalData.imagesUrl?.length < 5 && inputImageValue.imagesUrl && (<button 
                 className="btn btn-outline-primary btn-sm d-block w-100"
                 onClick={addImages}>
                   新增圖片
                 </button>)}
               </div>
               <div>
-                {modalData.imagesUrl && modalData.imagesUrl.length >=1 && (<button
+                {modalData.imagesUrl?.length >=1 && (<button
                 className="btn btn-outline-danger btn-sm d-block w-100"
                 onClick={deleteImages}>
                   刪除圖片
