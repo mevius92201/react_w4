@@ -27,9 +27,19 @@ function ProductModal ({ modalState, productModal, getProducts, isOpen, setIsOpe
         }
     }, []);
 
+    const [inputFileValue , setInputFileValue] = useState({
+        fileName: ""
+    })
 
 useEffect(() => {
     if(isOpen){
+        setInputImageValue({
+          imageUrl: "",
+          imagesUrl: ""
+        })
+        setInputFileValue({
+          fileName: ""
+        })
         myModalRef.current.show()
     } 
 },[isOpen])
@@ -86,7 +96,9 @@ useEffect(() => {
 
     const handleFileChange = async (e) => {
         const file = e.target.files[0]
+        console.log(file)
         const formData = new FormData()
+        console.log(formData)
         formData.append('file-to-upload', file)
         try{
         const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData) 
@@ -94,6 +106,10 @@ useEffect(() => {
             ...modalData,
             imageUrl: res.data.imageUrl
         })
+        setInputFileValue({
+          fileName: file.name
+        })
+       console.log(file.name)
         }catch(err){
         console.log("upload failed")
         }
@@ -116,7 +132,7 @@ useEffect(() => {
               is_enabled: modalData.is_enabled ? 1 : 0
         }})
         } catch(err){
-          console.log("add failed")
+          console.log("add failed", err.message)
         }
     }
     
@@ -143,7 +159,8 @@ useEffect(() => {
         hasModalHide()
         setModalData(productModal)
         } catch(error){
-        console.log("submit failed")
+          alert(error.response.data.message)
+          console.log("submit failed")
     }
     }
 
@@ -197,7 +214,7 @@ useEffect(() => {
                       className="form-control"
                       id="fileInput"
                       onChange={handleFileChange}
-                      //value={modalData.imageUrl}
+                      value={inputFileValue.fileName}
                     />
                   </div>
                   {modalData.imageUrl? <img
@@ -232,7 +249,7 @@ useEffect(() => {
                     placeholder="請輸入圖片連結"
                     />
                 </div>
-                <div className="mb-2">
+                <div className="mb-3">
                     {modalData.imagesUrl?.map((url,index) => (
                     <img key={index} 
                     className="img-fluid" 

@@ -12,13 +12,28 @@ function ProductPage({
     products}){
     
     const hasModalShow = (state, item) =>{
-      setProductModal(state);
+      setModalState(state);
       if (state === 'add'){
         setProductModal({...defaultModal})
         setModalState('add')
-      } else {
-        setProductModal(item)
+        
+      }
+      if (state === 'copy'){
+        setProductModal({
+          ...item,
+          title: `copy of ${item.title}`,
+          id: null
+        })
+        setModalState('add') 
+       
+      }if (state === 'edit'){
+        setProductModal({
+          ...item,
+        })
+        
         setModalState('edit')
+        console.log(item)
+        
       }
       if (myModalRef.current !== null){
         setIsProductModalOpen(true);
@@ -45,10 +60,10 @@ function ProductPage({
             <div className="text-end mt-4">
                 <button className="btn btn-primary" 
                 onClick={() => 
-                {hasModalShow('add');
-                setProductModal(defaultModal);
+                {hasModalShow(`add`, defaultModal);
+                //setProductModal(defaultModal);
                 }
-                }>建立新的產品</button>
+                }>Create</button>
             </div>
             <table className="table mt-4">
                 <thead>
@@ -76,20 +91,27 @@ function ProductPage({
                         )}
                     </td>
                     <td>
-                        <div className="btn-group">
+                    <div className="d-grid gap-1 d-md-flex justify-content-md-end">
                         <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-primary btn-sm"
                             onClick={() =>{hasModalShow(`edit`, item);}}     
                         >
-                            編輯
+                            Edit
                         </button>
                         <button
                             type="button"
-                            className="btn btn-outline-danger btn-sm"
+                            className="btn btn-success btn-sm"
+                            onClick={() =>{hasModalShow(`copy`, item);}}     
+                        >
+                            Copy
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-danger btn-sm"
                             onClick={() =>{hasDeleteModalShow(item)}}
                         >
-                            刪除
+                            Delete
                         </button>
                         </div>
                     </td>

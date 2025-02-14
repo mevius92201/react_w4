@@ -70,6 +70,9 @@ function App() {
       console.log(error.response.message);
     }
   };
+  useEffect(() => {
+    getProducts();
+  },[]);
 
   // const hasModalHide = () =>{
   //   if (myModalRef.current !== null){
