@@ -66,7 +66,6 @@ useEffect(() => {
       //     ...pre,
       //     [id]: value
       // }));
-      console.log(e.target.value)
     };
   
     const addImages = () => {
@@ -109,11 +108,11 @@ useEffect(() => {
     })
     fileRef.current.value = null
     }
-    const handleFileChange = async (e) => {
+    const handleFileChange = async(e)=> {
         const file = e.target.files[0]
-        console.log(file)
+        //console.log(file)
         const formData = new FormData()
-        console.log(formData)
+        //console.log(formData)
         formData.append('file-to-upload', file)
         try{
         const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData) 
@@ -130,6 +129,15 @@ useEffect(() => {
         console.log("upload failed")
         }
     }
+    // const uploadFile = async (e) => {
+    //     const formData = new FormData()
+    //     formData.append('file-to-upload', fileRef.current.files[0])
+    //     try{
+    //     await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData)
+    //     }catch(err){
+    //     console.log("upload failed")
+    //     }
+    //   }
     const setModalContent = (e) => {
         const {value, name, checked, type} = e.target
         setModalData({
@@ -137,6 +145,7 @@ useEffect(() => {
           [name]: type === "checkbox" ? checked : value
         })
     }
+  
     
     const addProduct = async () => {
         try {
@@ -171,6 +180,7 @@ useEffect(() => {
     try{
         //console.log(modalState)
         await updateModal();
+        //uploadFile()
         getProducts();
         hasModalHide()
         setModalData(productModal)
