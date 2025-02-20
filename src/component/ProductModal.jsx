@@ -17,6 +17,7 @@ function ProductModal ({ modalState, productModal, getProducts, isOpen, setIsOpe
         image: "",
         images: []
       })
+    const [fileDisplay, setFileDisplay] = useState("");
 
     useEffect(() => {
         if (modalRef.current !== null && myModalRef.current === null) {
@@ -42,6 +43,7 @@ useEffect(() => {
           ...pre,
           imagesUrl: (!pre.imagesUrl ? []: pre.imagesUrl)
         }))
+        setFileDisplay("")
         myModalRef.current.show()
     } 
 },[isOpen])
@@ -106,38 +108,59 @@ useEffect(() => {
         ...modalData,
         imageUrl: ""
     })
+    setFileDisplay("")
     fileRef.current.value = null
     }
-    const handleFileChange = async(e)=> {
+    const handleFileChange = (e)=> {
         const file = e.target.files[0]
+        if(!file) return
         //console.log(file)
-        const formData = new FormData()
+        //const formData = new FormData()
         //console.log(formData)
-        formData.append('file-to-upload', file)
-        try{
-        const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData) 
-        setModalData({
-            ...modalData,
-            imageUrl: res.data.imageUrl
-        })
-        return fileRef.current.value = file.name
+        //formData.append('file-to-upload', file)
+        const reader = new FileReader();
+        reader.onload = () => {
+          setFileDisplay(reader.result);
+        };
+        console.log(reader)
+        reader.readAsDataURL(file);
+        console.log(fileRef.current.files[0])
+
+        // try{
+        // const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData) 
+        // setModalData({
+        //     ...modalData,
+        //     imageUrl: res.data.imageUrl
+        // })
+        // return fileRef.current.value = file.name
         // console.log("fileName",fileRef.current)
         // setInputFileValue({
         //   fileName: file.name
         // })
+        // }catch(err){
+        // console.log("upload failed")
+        // }
+    }
+    
+    const uploadFile = async () => {
+        if (!fileRef.current.files[0]) {
+          console.log("No file selected");
+          return;
+        }
+        const formData = new FormData()
+        formData.append('file-to-upload', fileRef.current.files[0])
+        try{
+        const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData)
+        setModalData({
+          ...modalData,
+          imageUrl: res.data.imageUrl
+          })
+          console.log('checked',res.data.imageUrl)
+          return fileRef.current.value = fileRef.current.files[0].name
         }catch(err){
         console.log("upload failed")
         }
-    }
-    // const uploadFile = async (e) => {
-    //     const formData = new FormData()
-    //     formData.append('file-to-upload', fileRef.current.files[0])
-    //     try{
-    //     await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData)
-    //     }catch(err){
-    //     console.log("upload failed")
-    //     }
-    //   }
+      }
     const setModalContent = (e) => {
         const {value, name, checked, type} = e.target
         setModalData({
@@ -179,9 +202,10 @@ useEffect(() => {
     const updateModal = modalState === 'add' ? addProduct : editProduct;
     try{
         //console.log(modalState)
+        await uploadFile()
+        console.log(modalData.imgUrl)
         await updateModal();
-        //uploadFile()
-        getProducts();
+        await getProducts();
         hasModalHide()
         setModalData(productModal)
         } catch(error){
@@ -243,13 +267,15 @@ useEffect(() => {
                       ref={fileRef}
                       // value={inputFileValue.fileName}
                       //onClick={() => console.log(fileRef.current.value)}
-                    />                  
+                    />
+                    {/* <img className="img-fluid" src={fileDisplay} />                   */}
                   </div>
-                  {modalData.imageUrl? <img
+                  {(fileDisplay || modalData.imageUrl) && (
+                  <img
                       className="img-fluid"
-                      src={modalData.imageUrl}
+                      src={modalData.imageUrl || fileDisplay}
                       alt={modalData.title}
-                    /> : null}
+                    /> )}
                   <div>
                     {inputImageValue.image && (<button 
                       className="btn btn-outline-primary btn-sm d-block w-100"
@@ -258,7 +284,7 @@ useEffect(() => {
                     </button>)}
                 </div>
                 <div>
-                  {modalData.imageUrl && (<button
+                  {(fileDisplay || modalData.imageUrl) && (<button
                   className="btn btn-outline-danger btn-sm d-block w-100"
                   onClick={deleteImage}>
                     刪除圖片
