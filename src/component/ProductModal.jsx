@@ -149,18 +149,22 @@ useEffect(() => {
         }
         const formData = new FormData()
         formData.append('file-to-upload', fileRef.current.files[0])
-        try{
+        //try{
         const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData)
-        setModalData({
+        const data = {
           ...modalData,
           imageUrl: res.data.imageUrl
-          })
-          console.log('checked',res.data.imageUrl)
-          return fileRef.current.value = fileRef.current.files[0].name
-        }catch(err){
-        console.log("upload failed")
+          }
+        setModalData(data)
+        return data
+          //console.log('checked',res.data.imageUrl)
         }
-      }
+        
+          //return fileRef.current.value = fileRef.current.files[0].name
+        // }catch(err){
+        // console.log("upload failed")
+        // }
+      
     const setModalContent = (e) => {
         const {value, name, checked, type} = e.target
         setModalData({
@@ -170,28 +174,28 @@ useEffect(() => {
     }
   
     
-    const addProduct = async () => {
+    const addProduct = async (data) => {
         try {
           await axios.post(`${API_BASE}/api/${API_PATH}/admin/product`,{
             data: {
-              ...modalData,
-              origin_price: Number(modalData.origin_price),
-              price: Number(modalData.price),
-              is_enabled: modalData.is_enabled ? 1 : 0
+              ...data,
+              origin_price: Number(data.origin_price),
+              price: Number(data.price),
+              is_enabled: data.is_enabled ? 1 : 0
         }})
         } catch(err){
           console.log("add failed", err.message)
         }
     }
     
-    const editProduct = async () => {
+    const editProduct = async (data) => {
     try {
         await axios.put(`${API_BASE}/api/${API_PATH}/admin/product/${modalData.id}`,{
         data: {
-            ...modalData,
-            origin_price: Number(modalData.origin_price),
-            price: Number(modalData.price),
-            is_enabled: modalData.is_enabled ? 1 : 0
+            ...data,
+            origin_price: Number(data.origin_price),
+            price: Number(data.price),
+            is_enabled: data.is_enabled ? 1 : 0
     }})
     } catch(err){
         console.log("edit failed")
@@ -202,9 +206,9 @@ useEffect(() => {
     const updateModal = modalState === 'add' ? addProduct : editProduct;
     try{
         //console.log(modalState)
-        await uploadFile()
+        const data = await uploadFile()
         console.log(modalData.imgUrl)
-        await updateModal();
+        await updateModal(data);
         await getProducts();
         hasModalHide()
         setModalData(productModal)
@@ -284,7 +288,7 @@ useEffect(() => {
                     </button>)}
                 </div>
                 <div>
-                  {(fileDisplay || modalData.imageUrl) && (<button
+                  {(modalData.imageUrl || fileDisplay) && (<button
                   className="btn btn-outline-danger btn-sm d-block w-100"
                   onClick={deleteImage}>
                     刪除圖片
