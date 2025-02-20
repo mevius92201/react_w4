@@ -56,3 +56,7 @@ img {
   outline: none !important;
   box-shadow: none;
 }
+.pagination{
+  --bs-pagination-focus-box-shadow:
+  box-shadow: none;
+}
