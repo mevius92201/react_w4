@@ -6,7 +6,7 @@ const API_PATH = "mevius";
 function ProductModal ({ modalState, productModal, getProducts, isOpen, setIsOpen, myModalRef}) {
     const [modalData, setModalData] = useState(productModal)
     const modalRef = useRef(null);
-    
+    const fileRef = useRef(null);
     useEffect(() => {
         setModalData({
             ...productModal
@@ -14,7 +14,7 @@ function ProductModal ({ modalState, productModal, getProducts, isOpen, setIsOpe
     },[productModal])
 
     const [inputImageValue, setInputImageValue] = useState({
-        imageUrl: "",
+        image: "",
         images: []
       })
 
@@ -27,25 +27,28 @@ function ProductModal ({ modalState, productModal, getProducts, isOpen, setIsOpe
         }
     }, []);
 
-    const [inputFileValue , setInputFileValue] = useState({
-        fileName: ""
-    })
+    //const [inputFileValue , setInputFileValue] = useState({
+    //     fileName: ""
+    // })
 
 useEffect(() => {
     if(isOpen){
         setInputImageValue({
-          imageUrl: "",
-          imagesUrl: ""
-        })
-        setInputFileValue({
-          fileName: ""
-        })
+          image: "",
+          images: []
+        });
+        fileRef.current.value = null
+        setModalData((pre) => ({
+          ...pre,
+          imagesUrl: (!pre.imagesUrl ? []: pre.imagesUrl)
+        }))
         myModalRef.current.show()
     } 
 },[isOpen])
 
     const hasModalHide = () =>{
         if (myModalRef.current !== null){
+          //fileRef.current.value = null
           myModalRef.current.hide();
           setIsOpen(false)
         } else {
@@ -59,32 +62,44 @@ useEffect(() => {
           ...pre,
           [id]: value
         }))
-        //console.log(inputImageValue)
-    }
+      //   setModalData((pre) => ({
+      //     ...pre,
+      //     [id]: value
+      // }));
+      console.log(e.target.value)
+    };
+  
     const addImages = () => {
-    const newImagesUrl = [...modalData.imagesUrl, inputImageValue.images]
-    setModalData({
-        ...modalData,
-        imagesUrl: newImagesUrl
+    const newImagesUrl = [...modalData.imagesUrl || [], inputImageValue.images]
+      setModalData({
+      ...modalData,
+      imagesUrl: newImagesUrl
     })
-    setInputImageValue({imagesUrl: ""})
+    setInputImageValue((pre) => ({
+      ...pre,
+      images: ""
+    }));
     }
 
     const addImage = () => {
         setModalData({
         ...modalData,
-        imageUrl: inputImageValue.imageUrl
-    })
-    setInputImageValue({imageUrl: ""})
-    }
+        imageUrl: inputImageValue.image
+        })
+        setInputImageValue((pre) => ({
+        ...pre,
+        image: ""
+        }));
+        
+    };
     
     const deleteImages = () => {
     const newImagesUrl = [...modalData.imagesUrl]
     newImagesUrl.pop()
-    setModalData({
-        ...modalData,
+    setModalData((pre) => ({
+        ...pre,
         imagesUrl: newImagesUrl
-    })
+    }))
     }
 
     const deleteImage = () => {
@@ -92,8 +107,8 @@ useEffect(() => {
         ...modalData,
         imageUrl: ""
     })
+    fileRef.current.value = null
     }
-
     const handleFileChange = async (e) => {
         const file = e.target.files[0]
         console.log(file)
@@ -106,10 +121,11 @@ useEffect(() => {
             ...modalData,
             imageUrl: res.data.imageUrl
         })
-        setInputFileValue({
-          fileName: file.name
-        })
-       console.log(file.name)
+        return fileRef.current.value = file.name
+        // console.log("fileName",fileRef.current)
+        // setInputFileValue({
+        //   fileName: file.name
+        // })
         }catch(err){
         console.log("upload failed")
         }
@@ -196,9 +212,9 @@ useEffect(() => {
                       主圖
                     </label>
                     <input
-                      value={inputImageValue.imageUrl}
+                      value={inputImageValue.image}
                       onChange={handleImageChange}
-                      id="imageUrl"
+                      id="image"
                       type="text"
                       className="form-control"
                       placeholder="請輸入圖片連結"
@@ -214,8 +230,10 @@ useEffect(() => {
                       className="form-control"
                       id="fileInput"
                       onChange={handleFileChange}
-                      value={inputFileValue.fileName}
-                    />
+                      ref={fileRef}
+                      // value={inputFileValue.fileName}
+                      //onClick={() => console.log(fileRef.current.value)}
+                    />                  
                   </div>
                   {modalData.imageUrl? <img
                       className="img-fluid"
@@ -223,7 +241,7 @@ useEffect(() => {
                       alt={modalData.title}
                     /> : null}
                   <div>
-                    {inputImageValue.imageUrl && (<button 
+                    {inputImageValue.image && (<button 
                       className="btn btn-outline-primary btn-sm d-block w-100"
                       onClick={addImage}>
                       新增圖片
@@ -241,9 +259,9 @@ useEffect(() => {
                         附圖
                     </label>
                     <input
-                    value={inputImageValue.imagesUrl}
+                    value={inputImageValue.images}
                     onChange={handleImageChange}
-                    id="imagesUrl"
+                    id="images"
                     type="text"
                     className="form-control"
                     placeholder="請輸入圖片連結"
@@ -258,7 +276,7 @@ useEffect(() => {
                 </div>
               </div>
               <div>
-                {modalData.imagesUrl?.length < 5 && inputImageValue.imagesUrl && (<button 
+                {inputImageValue.images.length > 0 && modalData.imagesUrl?.length < 5 && (<button 
                 className="btn btn-outline-primary btn-sm d-block w-100"
                 onClick={addImages}>
                   新增圖片
