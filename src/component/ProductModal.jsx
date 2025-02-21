@@ -122,10 +122,9 @@ useEffect(() => {
         reader.onload = () => {
           setFileDisplay(reader.result);
         };
-        console.log(reader)
+        //console.log(reader)
         reader.readAsDataURL(file);
-        console.log(fileRef.current.files[0])
-
+        //console.log(fileRef.current.files[0])    
         // try{
         // const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData) 
         // setModalData({
@@ -140,7 +139,7 @@ useEffect(() => {
         // }catch(err){
         // console.log("upload failed")
         // }
-    }
+  }
     
     const uploadFile = async () => {
         if (!fileRef.current.files[0]) {
@@ -269,6 +268,7 @@ useEffect(() => {
                       id="fileInput"
                       onChange={handleFileChange}
                       ref={fileRef}
+                   
                       // value={inputFileValue.fileName}
                       //onClick={() => console.log(fileRef.current.value)}
                     />

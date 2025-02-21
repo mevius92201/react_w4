@@ -1,4 +1,5 @@
 import Pagination from '../Pagination';
+
 function ProductPage({
     myModalRef,
     myDeleteModalRef,
@@ -30,12 +31,9 @@ function ProductPage({
         setProductModal({
           ...item,
         })
-        
         setModalState('edit')
-        console.log(item)
-        
-      }
-      if (myModalRef.current !== null){
+        //console.log(item)
+      }if (myModalRef.current !== null){
         setIsProductModalOpen(true);
       } else {
         console.log('modalRef.current is null')
@@ -124,5 +122,4 @@ function ProductPage({
         </div>
     )
 }
-
 export default ProductPage;

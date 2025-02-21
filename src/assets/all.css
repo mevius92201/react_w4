@@ -52,11 +52,12 @@ img {
 .mb-3{
   text-align: left;
 }
-.page-item, .page-item:active {
-  outline: none !important;
+
+.pagination {
+  --bs-pagination-focus-box-shadow:
   box-shadow: none;
 }
-.pagination{
-  --bs-pagination-focus-box-shadow:
+
+.form-control:focus{
   box-shadow: none;
 }
