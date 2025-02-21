@@ -1,5 +1,4 @@
 import Pagination from '../Pagination';
-
 function ProductPage({
     myModalRef,
     myDeleteModalRef,

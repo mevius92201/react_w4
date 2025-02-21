@@ -144,7 +144,11 @@ useEffect(() => {
     const uploadFile = async () => {
         if (!fileRef.current.files[0]) {
           console.log("No file selected");
-          return;
+          const data = {
+            ...modalData,
+          }
+          setModalData(data)
+          return data;
         }
         const formData = new FormData()
         formData.append('file-to-upload', fileRef.current.files[0])
@@ -156,6 +160,7 @@ useEffect(() => {
           }
         setModalData(data)
         return data
+        
           //console.log('checked',res.data.imageUrl)
         }
         
@@ -184,6 +189,8 @@ useEffect(() => {
         }})
         } catch(err){
           console.log("add failed", err.message)
+          alert(err.request.responseText)
+          throw err
         }
     }
     
@@ -198,6 +205,8 @@ useEffect(() => {
     }})
     } catch(err){
         console.log("edit failed")
+        alert(err.request.responseText)
+        throw err
     }
     }
     
@@ -206,13 +215,13 @@ useEffect(() => {
     try{
         //console.log(modalState)
         const data = await uploadFile()
-        console.log(modalData.imgUrl)
+        //console.log(modalData.imgUrl)
         await updateModal(data);
         await getProducts();
         hasModalHide()
         setModalData(productModal)
         } catch(error){
-          alert(error.response.data.message)
+          //alert(error.response.message)
           console.log("submit failed")
     }
     }
