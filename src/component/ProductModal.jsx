@@ -245,7 +245,7 @@ useEffect(() => {
               <div className="col-sm-4">
                 <div className="mb-2">
                 <div className="mb-3">
-                    <label htmlFor="imageUrl" className="form-label">
+                    <label htmlFor="image" className="form-label">
                       主圖
                     </label>
                     <input
@@ -295,7 +295,7 @@ useEffect(() => {
                   </button>)}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="imagesUrl" className="form-label">
+                    <label htmlFor="images" className="form-label">
                         附圖
                     </label>
                     <input
