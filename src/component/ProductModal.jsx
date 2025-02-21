@@ -286,7 +286,7 @@ useEffect(() => {
                   {(fileDisplay || modalData.imageUrl) && (
                   <img
                       className="img-fluid"
-                      src={modalData.imageUrl || fileDisplay}
+                      src={fileDisplay || modalData.imageUrl}
                       alt={modalData.title}
                     /> )}
                   <div>
@@ -297,7 +297,7 @@ useEffect(() => {
                     </button>)}
                 </div>
                 <div>
-                  {(modalData.imageUrl || fileDisplay) && (<button
+                  {(fileDisplay || modalData.imageUrl) && (<button
                   className="btn btn-outline-danger btn-sm d-block w-100"
                   onClick={deleteImage}>
                     刪除圖片
